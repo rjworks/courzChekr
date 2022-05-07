@@ -1,1 +1,3 @@
-# course-cheker
+# courzChek
+
+Checks for course seats opening
