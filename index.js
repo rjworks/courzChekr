@@ -45,7 +45,7 @@ client.on('messageCreate', msg => {
             case "checklist":
                 let checklist = "";
                 for(const course of urls) {
-                    msg += course.course + " - " + course.url
+                    checklist += `Checklist: \n\n[ID: ${course.id}] ` + course.course + " - " + course.url
                 }
                 msg.reply(checklist)
                 break;
@@ -71,7 +71,7 @@ const saveUrls = (newUrl) => {
     });
 
     console.log(urls)
-    fs.writeFile("urls.json", urls, function(err) {
+    fs.writeFile("urls.json", JSON.stringify(urls), function(err) {
             if(err) throw err;
         }
     );

@@ -1,7 +1,1 @@
-[
-  {
-    "id": 1,
-    "course": "PHIL 331 001",
-    "url": "https://courses.students.ubc.ca/cs/courseschedule?sesscd=S&campuscd=UBCO&pname=subjarea&tname=subj-section&sessyr=2022&course=331&section=001&dept=PHIL"
-  }
-]
+[{"id":1,"course":"PHIL 331 001","url":"https://courses.students.ubc.ca/cs/courseschedule?sesscd=S&campuscd=UBCO&pname=subjarea&tname=subj-section&sessyr=2022&course=331&section=001&dept=PHIL"},{"id":2,"course":"JPST 100 001","url":"https://courses.students.ubc.ca/cs/courseschedule?sesscd=S&campuscd=UBCO&pname=subjarea&tname=subj-section&sessyr=2022&course=100&section=001&dept=JPST"}]
