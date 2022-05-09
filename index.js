@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const cron = require('cron');
 const axios = require("axios");
 const cheerio = require("cheerio");
@@ -6,14 +6,14 @@ const fs = require('fs');
 const {Client, Intents} = require('discord.js');
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 
-let urls = [];
+let courses = [];
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setPresence({activities: [{name: 'eEe', type: 'WATCHING'}]});
 
-    let rawdata = fs.readFileSync('urls.json');
-    urls = JSON.parse(rawdata);
-    console.log(urls.length)
+    let rawdata = fs.readFileSync('courses.json');
+    courses = JSON.parse(rawdata);
+    console.log(courses.length)
 });
 
 async function scrape() {
@@ -32,7 +32,7 @@ let scheduledCheck = new cron.CronJob('*/5 * * * *', () => {
 
 client.on('messageCreate', msg => {
     if(msg.content === `<@!${client.user.id}>`) {
-        msg.reply('Hi there')
+        msg.reply('Hi there');
         return;
     }
     if(msg.content.startsWith(process.env.PREFIX)) {
@@ -40,42 +40,68 @@ client.on('messageCreate', msg => {
         const command = args.shift().toLowerCase();
         switch(command) {
             case "add":
-                msg.reply(saveUrls(args[0]));
+                msg.reply(addCourse(args[0]));
+                break;
+            case "remove":
+                if(args[0] === undefined) {
+                    return msg.reply("Enter course ID. Example: !remove 2 \n\nType !checklist to check course ID")
+                }
+                msg.reply(removeCourse(parseInt(args[0])));
                 break;
             case "checklist":
                 let checklist = "";
-                for(const course of urls) {
-                    checklist += `Checklist: \n\n[ID: ${course.id}] ` + course.course + " - " + course.url
+                if(courses.length === 0) return msg.reply("The checklist is empty.");
+                for(const course of courses) {
+                    checklist += `Checklist: \n\n[ID: ${course.id}] ` + course.course + " - " + course.url;
                 }
-                msg.reply(checklist)
+                msg.reply(checklist);
                 break;
         }
     }
 });
 
-const saveUrls = (newUrl) => {
-    for(const url of urls) {
-        if(url.url === newUrl) {
+const addCourse = (courseUrl) => {
+    for(const course of courses) {
+        if(course.url === courseUrl) {
             return 'This course is already in the checklist!';
         }
     }
-    let arr = newUrl.split('=');
+
+    let arr = courseUrl.split('=');
     let course = arr[8];
     let code = arr[6].split('&')[0];
     let section = arr[7].split('&')[0];
 
-    urls.push({
-        "id": urls.length + 1,
-        "course": `${course} ${code} ${section}`,
-        "url": newUrl
+    course = `${course} ${code} ${section}`;
+    courses.push({
+        "id": courses.length + 1,
+        "course": course,
+        "url": courseUrl
     });
 
-    console.log(urls)
-    fs.writeFile("urls.json", JSON.stringify(urls), function(err) {
+    saveCourses();
+
+    return `Successfully added ${course}`;
+}
+
+const removeCourse = (courseId) => {
+    console.log(courseId);
+    for(const course of courses) {
+        if(course.id === courseId) {
+            courses = courses.filter((el) => el.id !== courseId);
+            saveCourses();
+            return `Successfully removed ${course.course}`;
+        }
+    }
+    return "The given course ID could not be found.";
+}
+const saveCourses = () => {
+    if(courses.length === 0) return;
+    fs.writeFile("courses.json", JSON.stringify(courses), function(err) {
             if(err) throw err;
         }
     );
-    return 'Success :]'
+    // return 'Successfully saved courses.'
 }
 
 client.login(process.env.TOKEN);
