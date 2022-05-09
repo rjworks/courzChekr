@@ -13,14 +13,27 @@ client.on('ready', () => {
 
     let rawdata = fs.readFileSync('courses.json');
     courses = JSON.parse(rawdata);
-    console.log(courses.length)
+
+    scheduledCheck.start();
 });
 
 async function scrape() {
     try {
-
+        for(let course of courses) {
+            // Fetch HTML of the page we want to scrape
+            const {data} = await axios.get(course.url);
+            // Load HTML we fetched in the previous line
+            const $ = cheerio.load(data);
+            let seatsRemaining = $("body > div.container > div.content.expand > table.\\'table > tbody > tr:nth-child(1) > td:nth-child(2) > strong").text();
+            if(seatsRemaining > 0) {
+                let channel = client.channels.cache.get("973344306893037659");
+                channel.send({
+                    content:`**${seatsRemaining} SEATS OPEN FOR ${course.course}!**\n\n Register: ${course.url} \n\n@everyone`,
+                });
+            }
+        }
     } catch(err) {
-        console.error(err);
+        console.error('err');
     }
 }
 
@@ -49,10 +62,10 @@ client.on('messageCreate', msg => {
                 msg.reply(removeCourse(parseInt(args[0])));
                 break;
             case "checklist":
-                let checklist = "";
+                let checklist = "Checklist: \n";
                 if(courses.length === 0) return msg.reply("The checklist is empty.");
                 for(const course of courses) {
-                    checklist += `Checklist: \n\n[ID: ${course.id}] ` + course.course + " - " + course.url;
+                    checklist += `\n\n[ID: ${course.id}] ` + course.course + " - " + course.url;
                 }
                 msg.reply(checklist);
                 break;
@@ -73,8 +86,9 @@ const addCourse = (courseUrl) => {
     let section = arr[7].split('&')[0];
 
     course = `${course} ${code} ${section}`;
+    const id = parseInt(Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString().substr(2, 2));
     courses.push({
-        "id": courses.length + 1,
+        id,
         "course": course,
         "url": courseUrl
     });
@@ -95,13 +109,13 @@ const removeCourse = (courseId) => {
     }
     return "The given course ID could not be found.";
 }
+
 const saveCourses = () => {
     if(courses.length === 0) return;
     fs.writeFile("courses.json", JSON.stringify(courses), function(err) {
             if(err) throw err;
         }
     );
-    // return 'Successfully saved courses.'
 }
 
 client.login(process.env.TOKEN);
