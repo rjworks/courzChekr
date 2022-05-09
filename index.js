@@ -99,7 +99,6 @@ const addCourse = (courseUrl) => {
 }
 
 const removeCourse = (courseId) => {
-    console.log(courseId);
     for(const course of courses) {
         if(course.id === courseId) {
             courses = courses.filter((el) => el.id !== courseId);
