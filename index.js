@@ -37,9 +37,9 @@ async function scrape() {
     }
 }
 
-let scheduledCheck = new cron.CronJob('*/5 * * * *', () => {
-    // */5 * * * *
-    // This runs every 5th minute // https://crontab.guru/every-5-minutes
+let scheduledCheck = new cron.CronJob('*/2 * * * *', () => {
+    // */2 * * * *
+    // This runs every 2th minute // https://crontab.guru/every-5-minutes
     scrape();
 }, null, true, 'America/Vancouver');
 
