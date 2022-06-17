@@ -28,7 +28,7 @@ async function scrape() {
             if(seatsRemaining > 0) {
                 let channel = client.channels.cache.get("973344306893037659");
                 channel.send({
-                    content:`**${seatsRemaining} SEATS OPEN FOR ${course.course}!**\n\n Register: ${course.url} \n\n@everyone`,
+                    content: `**${seatsRemaining} SEATS OPEN FOR ${course.course}!**\n\n Register: ${course.url} \n\n@everyone`,
                 });
             }
         }
@@ -61,7 +61,7 @@ client.on('messageCreate', msg => {
                 }
                 msg.reply(removeCourse(parseInt(args[0])));
                 break;
-            case "checklist":
+            case "list":
                 let checklist = "Checklist: \n";
                 if(courses.length === 0) return msg.reply("The checklist is empty.");
                 for(const course of courses) {
@@ -80,22 +80,26 @@ const addCourse = (courseUrl) => {
         }
     }
 
-    let arr = courseUrl.split('=');
-    let course = arr[8];
-    let code = arr[6].split('&')[0];
-    let section = arr[7].split('&')[0];
+    try {
+        let arr = courseUrl.split('=');
+        let course = arr[8];
+        let code = arr[6].split('&')[0];
+        let section = arr[7].split('&')[0];
 
-    course = `${course} ${code} ${section}`;
-    const id = parseInt(Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString().substr(2, 2));
-    courses.push({
-        id,
-        "course": course,
-        "url": courseUrl
-    });
+        course = `${course} ${code} ${section}`;
+        const id = parseInt(Math.floor(Math.random() * Math.floor(Math.random() * Date.now())).toString().substr(2, 2));
+        courses.push({
+            id,
+            "course": course,
+            "url": courseUrl
+        });
 
-    saveCourses();
+        saveCourses();
 
-    return `Successfully added ${course}`;
+        return `Successfully added ${course}`;
+    } catch(err) {
+        return 'Plz enter a working link'
+    }
 }
 
 const removeCourse = (courseId) => {
