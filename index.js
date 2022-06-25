@@ -24,7 +24,7 @@ async function scrape() {
             const {data} = await axios.get(course.url);
             // Load HTML we fetched in the previous line
             const $ = cheerio.load(data);
-            let seatsRemaining = $("body > div.container > div.content.expand > table.\\'table > tbody > tr:nth-child(1) > td:nth-child(2) > strong").text();
+            let seatsRemaining = $("body > div.container > div.content.expand > table.\'table > tbody > tr:nth-child(3) > td:nth-child(2) > strong").text();
             if(seatsRemaining > 0) {
                 let channel = client.channels.cache.get("973344306893037659");
                 channel.send({
